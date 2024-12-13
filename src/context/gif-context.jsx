@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 
 const GifContext = createContext();
@@ -8,6 +8,7 @@ const GifProvider = ({ children }) => {
   const [filter, setFilter] = useState("gifs");
   const [favorites, setFavorites] = useState([]);
   const gf = new GiphyFetch(import.meta.env.GIPHY_KEY);
+
   return (
     <GifContext.Provider
       value={{
