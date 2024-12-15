@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiEllipsisVertical, HiMiniBars3BottomRight } from "react-icons/hi2";
 import { Link } from "react-router-dom";
 import { GifState } from "../context/gif-context";
@@ -7,18 +7,38 @@ const Header = () => {
   const [categories, setCategories] = useState([]);
   const [showCategories, setShowCategories] = useState(false);
 
-  const { gf } = GifState();
+  const { gf, filter, setFilter, favorites } = GifState();
 
+  const fetchGifCategories = async () => {
+    const res = await fetch("/categories.json");
+    const { data } = await res.json();
+    setCategories(data);
+  };
+  useEffect(() => {
+    fetchGifCategories();
+  }, []);
   return (
     <nav>
-      <div className="relative flex gap-4 justify-between items-center mb-2">
+      <div className="relative flex items-center justify-between gap-4 mb-2">
         <Link to="/" className="flex gap-2">
           <img src="/logo.svg" className="w-8" alt="Gif logo" />
           <h1 className="text-5xl font-bold tracking-tight cursor-pointer">
             GIF Extractor
           </h1>
         </Link>
-        <Link className="px-4 py-1 transition ease-in-out hover:gradient border-b-4 hidden lg:block">
+
+        {categories?.slice(0, 5).map((category) => {
+          return (
+            <Link
+              className="hidden px-4 py-1 transition ease-in-out border-b-4 hover:gradient lg:block"
+              key={category.name}
+              to={`/${category.name_encoded}`}
+            >
+              {category.name}
+            </Link>
+          );
+        })}
+        <Link className="hidden px-4 py-1 transition ease-in-out border-b-4 hover:gradient lg:block">
           Test Recation
         </Link>
         <button onClick={() => setShowCategories(!showCategories)}>
@@ -34,15 +54,15 @@ const Header = () => {
         </div>
         <button onClick={() => setShowCategories(!showCategories)}>
           <HiMiniBars3BottomRight
-            className="text-sky-400 block lg:hidden"
+            className="block text-sky-400 lg:hidden"
             size={30}
           />
         </button>
 
         {showCategories && (
-          <div className="absolute right-0 top-14 px-10 pt-6 pb-9 w-full gradient z-20">
+          <div className="absolute right-0 z-20 w-full px-10 pt-6 top-14 pb-9 gradient">
             <span className="text-3xl font-extrabold">Categories</span>
-            <hr className="bg-gray-100 opacity-50 my-5" />
+            <hr className="my-5 bg-gray-100 opacity-50" />
           </div>
         )}
       </div>
